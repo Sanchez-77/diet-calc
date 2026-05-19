@@ -146,7 +146,7 @@ tr:last-child td { border-bottom: none; }
 <h2>高碳日（大肌群训练日）</h2>
 <table>
 <tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
-<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>早餐</td><td style="text-align:left" id="c-h-bf">—</td><td id="c-h-bf-c">0</td><td id="c-h-bf-p">0</td><td id="c-h-bf-f">0</td></tr>
 <tr><td>午餐</td><td style="text-align:left" id="c-h-lunch">—</td><td id="c-h-lunch-c">0</td><td id="c-h-lunch-p">0</td><td id="c-h-lunch-f">0</td></tr>
 <tr><td>晚餐</td><td style="text-align:left" id="c-h-dinner">—</td><td id="c-h-dinner-c">0</td><td id="c-h-dinner-p">0</td><td id="c-h-dinner-f">0</td></tr>
 <tr style="font-weight:700"><td>日总计</td><td></td><td id="c-h-total-c">0</td><td id="c-h-total-p">0</td><td id="c-h-total-f">0</td></tr>
@@ -157,7 +157,7 @@ tr:last-child td { border-bottom: none; }
 <h2>中碳日（胸/背/肩/手臂）</h2>
 <table>
 <tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
-<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>早餐</td><td style="text-align:left" id="c-m-bf">—</td><td id="c-m-bf-c">0</td><td id="c-m-bf-p">0</td><td id="c-m-bf-f">0</td></tr>
 <tr><td>午餐</td><td style="text-align:left" id="c-m-lunch">—</td><td id="c-m-lunch-c">0</td><td id="c-m-lunch-p">0</td><td id="c-m-lunch-f">0</td></tr>
 <tr><td>晚餐</td><td style="text-align:left" id="c-m-dinner">—</td><td id="c-m-dinner-c">0</td><td id="c-m-dinner-p">0</td><td id="c-m-dinner-f">0</td></tr>
 <tr style="font-weight:700"><td>日总计</td><td></td><td id="c-m-total-c">0</td><td id="c-m-total-p">0</td><td id="c-m-total-f">0</td></tr>
@@ -168,7 +168,7 @@ tr:last-child td { border-bottom: none; }
 <h2>低碳日（休息日）</h2>
 <table>
 <tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
-<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>早餐</td><td style="text-align:left" id="c-l-bf">—</td><td id="c-l-bf-c">0</td><td id="c-l-bf-p">0</td><td id="c-l-bf-f">0</td></tr>
 <tr><td>午餐</td><td style="text-align:left" id="c-l-lunch">—</td><td id="c-l-lunch-c">0</td><td id="c-l-lunch-p">0</td><td id="c-l-lunch-f">0</td></tr>
 <tr><td>晚餐</td><td style="text-align:left" id="c-l-dinner">—</td><td id="c-l-dinner-c">0</td><td id="c-l-dinner-p">0</td><td id="c-l-dinner-f">0</td></tr>
 <tr style="font-weight:700"><td>日总计</td><td></td><td id="c-l-total-c">0</td><td id="c-l-total-p">0</td><td id="c-l-total-f">0</td></tr>
@@ -269,12 +269,38 @@ function calculate() {
     const mCal = Math.round(mCarb * 4 + cPro * 4 + mFat * 9);
     const lCal = Math.round(lCarb * 4 + cPro * 4 + lFat * 9);
 
-    const hRice = Math.round((hCarb - 41) / 0.77);
-    const mRice = Math.round((mCarb - 41) / 0.77);
-    const lPotato = Math.round((lCarb - 41) / 0.22);
+    // 燕麦: 每100g含 63g碳水 13g蛋白 9g脂肪
+    // 腰果: 每20g含 6g碳水 3.6g蛋白 8.8g脂肪
+    // 牛奶200ml: 9.6g碳水 6.8g蛋白 2.4g脂肪
+    // 3全蛋: 0碳水 21g蛋白 15g脂肪
+    // 早餐分配: 碳水目标的15%给早餐(高碳), 25%(中碳), 40%(低碳)
+    const hBfCarb = Math.round(hCarb * 0.13);
+    const mBfCarb = Math.round(mCarb * 0.25);
+    const lBfCarb = Math.round(lCarb * 0.40);
 
-    const hCooked = Math.round(hRice * 2.5);
-    const mCooked = Math.round(mRice * 2.5);
+    // 早餐碳水 = 燕麦碳水 + 牛奶9.6 + 腰果碳水
+    // 高/中碳日无腰果, 低碳日+20g腰果(6g碳水)
+    const hOats = Math.round((hBfCarb - 9.6) / 0.63);
+    const mOats = Math.round((mBfCarb - 9.6) / 0.63);
+    const lOats = Math.round((lBfCarb - 9.6 - 6) / 0.63);
+
+    const hOatsCarb = Math.round(hOats * 0.63 + 9.6);
+    const mOatsCarb = Math.round(mOats * 0.63 + 9.6);
+    const lOatsCarb = Math.round(lOats * 0.63 + 9.6 + 6);
+
+    const hOatsFat = Math.round(hOats * 0.09 + 2.4 + 15);
+    const mOatsFat = Math.round(mOats * 0.09 + 2.4 + 15);
+    const lOatsFat = Math.round(lOats * 0.09 + 2.4 + 15 + 8.8);
+
+    const hOatsPro = Math.round(hOats * 0.13 + 6.8 + 21);
+    const mOatsPro = Math.round(mOats * 0.13 + 6.8 + 21);
+    const lOatsPro = Math.round(lOats * 0.13 + 6.8 + 21 + 3.6);
+
+    // 午晚餐碳水 = 总碳水 - 早餐碳水
+    const hRice = Math.round((hCarb - hOatsCarb) / 0.77);
+    const mRice = Math.round((mCarb - mOatsCarb) / 0.77);
+    const lPotato = Math.round((lCarb - lOatsCarb - 6) / 0.22); // 晚餐20g腰果6g碳水
+
     const hRiceLunch = Math.round(hRice * 0.53);
     const hRiceDinner = hRice - hRiceLunch;
     const hCookedLunch = Math.round(hRiceLunch * 2.5);
@@ -287,6 +313,10 @@ function calculate() {
     const lDinnerPotato = lPotato - lLunchPotato;
 
     // 高碳日
+    document.getElementById('c-h-bf').textContent = `${hOats}g燕麦 + 200ml低脂奶 + 3全蛋`;
+    document.getElementById('c-h-bf-c').textContent = hOatsCarb + 'g';
+    document.getElementById('c-h-bf-p').textContent = hOatsPro + 'g';
+    document.getElementById('c-h-bf-f').textContent = hOatsFat + 'g';
     const hLunchC = Math.round(hRiceLunch * 0.77);
     const hDinnerC = Math.round(hRiceDinner * 0.77);
     document.getElementById('c-h-lunch').textContent = `${hRiceLunch}g生米(${hCookedLunch}g熟米) + 250g鸡腿 + 少油蔬菜`;
@@ -298,10 +328,14 @@ function calculate() {
     document.getElementById('c-h-dinner-p').textContent = '60g';
     document.getElementById('c-h-dinner-f').textContent = '20g';
     document.getElementById('c-h-total-c').textContent = hCarb + 'g';
-    document.getElementById('c-h-total-p').textContent = cPro + 'g';
-    document.getElementById('c-h-total-f').textContent = hFat + 'g';
+    document.getElementById('c-h-total-p').textContent = (hOatsPro + 120) + 'g';
+    document.getElementById('c-h-total-f').textContent = (hOatsFat + 47) + 'g';
 
     // 中碳日
+    document.getElementById('c-m-bf').textContent = `${mOats}g燕麦 + 200ml低脂奶 + 3全蛋`;
+    document.getElementById('c-m-bf-c').textContent = mOatsCarb + 'g';
+    document.getElementById('c-m-bf-p').textContent = mOatsPro + 'g';
+    document.getElementById('c-m-bf-f').textContent = mOatsFat + 'g';
     const mLunchC = Math.round(mRiceLunch * 0.77);
     const mDinnerC = Math.round(mRiceDinner * 0.77);
     document.getElementById('c-m-lunch').textContent = `${mRiceLunch}g生米(${mCookedLunch}g熟米) + 250g鸡腿 + 11g油炒菜`;
@@ -313,23 +347,27 @@ function calculate() {
     document.getElementById('c-m-dinner-p').textContent = '60g';
     document.getElementById('c-m-dinner-f').textContent = '20g';
     document.getElementById('c-m-total-c').textContent = mCarb + 'g';
-    document.getElementById('c-m-total-p').textContent = cPro + 'g';
-    document.getElementById('c-m-total-f').textContent = mFat + 'g';
+    document.getElementById('c-m-total-p').textContent = (mOatsPro + 120) + 'g';
+    document.getElementById('c-m-total-f').textContent = (mOatsFat + 51) + 'g';
 
     // 低碳日
+    document.getElementById('c-l-bf').textContent = `${lOats}g燕麦 + 200ml低脂奶 + 3全蛋 + 20g腰果`;
+    document.getElementById('c-l-bf-c').textContent = lOatsCarb + 'g';
+    document.getElementById('c-l-bf-p').textContent = lOatsPro + 'g';
+    document.getElementById('c-l-bf-f').textContent = lOatsFat + 'g';
     const lLunchC = Math.round(lLunchPotato * 0.22);
-    const lDinnerC = Math.round(lDinnerPotato * 0.22);
+    const lDinnerC = Math.round(lDinnerPotato * 0.22) + 6;
     document.getElementById('c-l-lunch').textContent = `${lLunchPotato}g红薯 + 250g鸡腿 + 25g橄榄油拌菜`;
     document.getElementById('c-l-lunch-c').textContent = lLunchC + 'g';
     document.getElementById('c-l-lunch-p').textContent = '60g';
     document.getElementById('c-l-lunch-f').textContent = '45g';
-    document.getElementById('c-l-dinner').textContent = `${lDinnerPotato}g红薯 + 250g鸡腿 + 20g坚果`;
+    document.getElementById('c-l-dinner').textContent = `${lDinnerPotato}g红薯 + 250g鸡腿 + 20g腰果`;
     document.getElementById('c-l-dinner-c').textContent = lDinnerC + 'g';
-    document.getElementById('c-l-dinner-p').textContent = '60g';
-    document.getElementById('c-l-dinner-f').textContent = '20g';
+    document.getElementById('c-l-dinner-p').textContent = '64g';
+    document.getElementById('c-l-dinner-f').textContent = '29g';
     document.getElementById('c-l-total-c').textContent = lCarb + 'g';
-    document.getElementById('c-l-total-p').textContent = cPro + 'g';
-    document.getElementById('c-l-total-f').textContent = lFat + 'g';
+    document.getElementById('c-l-total-p').textContent = (lOatsPro + 124) + 'g';
+    document.getElementById('c-l-total-f').textContent = (lOatsFat + 74) + 'g';
 
     document.getElementById('c-h-rice').textContent = hRice + 'g';
     document.getElementById('c-h-rice-c').textContent = Math.round(hRice * 2.5) + 'g';
