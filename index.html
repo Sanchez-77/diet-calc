@@ -27,10 +27,29 @@ h1 { text-align: center; font-size: 28px; margin-bottom: 8px; background: linear
 .result-box .label { font-size: 12px; color: #888; margin-bottom: 4px; }
 .result-box .value { font-size: 22px; font-weight: 700; color: #ff8e53; }
 .result-box .sub { font-size: 11px; color: #555; margin-top: 2px; }
-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-th, td { padding: 10px 12px; text-align: center; font-size: 13px; border-bottom: 1px solid #2a2a2a; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; overflow-x: auto; display: block; }
+th, td { padding: 10px 12px; text-align: center; font-size: 13px; border-bottom: 1px solid #2a2a2a; white-space: nowrap; }
 th { color: #888; font-weight: 500; font-size: 12px; }
 td { color: #ddd; }
+@media (max-width: 600px) {
+body { padding: 12px; }
+h1 { font-size: 22px; }
+.card { padding: 16px; border-radius: 12px; }
+.card h2 { font-size: 15px; }
+.form-row { gap: 10px; }
+.form-row label { min-width: 70px; font-size: 13px; }
+.form-row input, .form-row select { width: 140px; padding: 8px 10px; font-size: 13px; }
+.btn { width: 100%; padding: 14px; font-size: 15px; }
+.result-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.result-box { padding: 10px 6px; }
+.result-box .value { font-size: 18px; }
+.result-box .label { font-size: 11px; }
+.result-box .sub { font-size: 10px; }
+table { font-size: 12px; }
+th, td { padding: 8px 6px; font-size: 11px; }
+.toggle-btn { font-size: 12px; padding: 8px; }
+.tips p { font-size: 11px; }
+}
 tr:last-child td { border-bottom: none; }
 .tag-high { background: #ff6b6b22; color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 .tag-mid { background: #ffa06b22; color: #ffa06b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
