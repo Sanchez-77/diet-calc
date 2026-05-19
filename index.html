@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>减脂饮食计算器</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; min-height: 100vh; padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { text-align: center; font-size: 28px; margin-bottom: 8px; background: linear-gradient(135deg, #ff6b6b, #ffa06b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 14px; }
+.card { background: #1a1a1a; border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #2a2a2a; }
+.card h2 { font-size: 18px; margin-bottom: 16px; color: #fff; display: flex; align-items: center; gap: 8px; }
+.card h2::before { content: ''; width: 4px; height: 18px; background: linear-gradient(180deg, #ff6b6b, #ffa06b); border-radius: 2px; }
+.form-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+.form-row label { min-width: 100px; font-size: 14px; color: #aaa; }
+.form-row input, .form-row select { background: #252525; border: 1px solid #333; border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 14px; width: 160px; }
+.form-row input:focus, .form-row select:focus { outline: none; border-color: #ff6b6b; }
+.form-row .unit { color: #666; font-size: 13px; margin-left: -8px; }
+.btn { background: linear-gradient(135deg, #ff6b6b, #ff8e53); border: none; border-radius: 10px; padding: 12px 32px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: transform 0.1s; }
+.btn:hover { transform: scale(1.02); }
+.btn:active { transform: scale(0.98); }
+.results { display: none; }
+.result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.result-box { background: #222; border-radius: 12px; padding: 16px; text-align: center; }
+.result-box .label { font-size: 12px; color: #888; margin-bottom: 4px; }
+.result-box .value { font-size: 22px; font-weight: 700; color: #ff8e53; }
+.result-box .sub { font-size: 11px; color: #555; margin-top: 2px; }
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+th, td { padding: 10px 12px; text-align: center; font-size: 13px; border-bottom: 1px solid #2a2a2a; }
+th { color: #888; font-weight: 500; font-size: 12px; }
+td { color: #ddd; }
+tr:last-child td { border-bottom: none; }
+.tag-high { background: #ff6b6b22; color: #ff6b6b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag-mid { background: #ffa06b22; color: #ffa06b; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.tag-low { background: #6bafff22; color: #6bafff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.toggle-group { display: flex; gap: 0; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+.toggle-btn { flex: 1; padding: 10px; text-align: center; cursor: pointer; font-size: 13px; background: #1a1a1a; color: #888; transition: all 0.2s; }
+.toggle-btn.active { background: #ff6b6b; color: #fff; font-weight: 600; }
+.meal-section { margin-top: 16px; }
+.meal-title { font-size: 14px; font-weight: 600; color: #ffa06b; margin: 12px 0 8px; }
+.meal-item { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #bbb; border-bottom: 1px solid #1f1f1f; }
+.tips { margin-top: 16px; padding: 14px; background: #1f1f1f; border-radius: 10px; border-left: 3px solid #ff6b6b; }
+.tips p { font-size: 12px; color: #999; line-height: 1.8; }
+.tips strong { color: #ff8e53; }
+.mode-label { font-size: 11px; color: #666; text-align: center; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>减脂饮食计算器</h1>
+<p class="subtitle">基于谭成毅 + 凯圣王方法论 · 固定饮食 / 碳水循环 双模式</p>
+
+<div class="card">
+<h2>基础信息</h2>
+<div class="form-row">
+<label>体重</label>
+<input type="number" id="weight" value="95" min="40" max="200">
+<span class="unit">kg</span>
+</div>
+<div class="form-row">
+<label>体型</label>
+<select id="bodyType">
+<option value="endo">内胚型（易胖）</option>
+<option value="ecto">外胚型（易瘦）</option>
+</select>
+</div>
+<div class="form-row">
+<label>每周运动</label>
+<select id="exercise">
+<option value="2">2-3小时 (约2次)</option>
+<option value="3">4-5小时 (约3次)</option>
+<option value="4" selected>6-7小时 (约4次)</option>
+<option value="5">8-9小时 (约5次)</option>
+</select>
+</div>
+<div class="form-row">
+<label>性别</label>
+<select id="gender">
+<option value="male">男</option>
+<option value="female">女</option>
+</select>
+</div>
+<button class="btn" onclick="calculate()">计算方案</button>
+</div>
+
+<div class="results" id="results">
+<div class="card">
+<h2>模式选择</h2>
+<div class="toggle-group">
+<div class="toggle-btn active" onclick="switchMode('fixed')">固定饮食</div>
+<div class="toggle-btn" onclick="switchMode('cycle')">碳水循环</div>
+</div>
+<p class="mode-label" id="modeLabel">每天吃一样，简单易执行（谭成毅方法）</p>
+</div>
+
+<div id="fixedResult">
+<div class="card">
+<h2>每日营养目标</h2>
+<div class="result-grid">
+<div class="result-box"><div class="label">碳水</div><div class="value" id="f-carb">0</div><div class="sub">克/天</div></div>
+<div class="result-box"><div class="label">蛋白质</div><div class="value" id="f-protein">0</div><div class="sub">克/天</div></div>
+<div class="result-box"><div class="label">脂肪</div><div class="value" id="f-fat">0</div><div class="sub">克/天</div></div>
+</div>
+<div class="result-grid">
+<div class="result-box"><div class="label">总热量</div><div class="value" id="f-cal">0</div><div class="sub">kcal/天</div></div>
+<div class="result-box"><div class="label">生米量</div><div class="value" id="f-rice">0</div><div class="sub">克 (午+晚)</div></div>
+<div class="result-box"><div class="label">熟米量</div><div class="value" id="f-rice-cooked">0</div><div class="sub">克 (约)</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2>调整规则</h2>
+<div class="tips">
+<p><strong>每10天</strong>称重 + 拍照对比</p>
+<p>掉 0.5-1kg/周 → 继续保持</p>
+<p>掉太快 (>1.5kg) → 碳水 <strong>+20g</strong></p>
+<p>掉太慢 (<0.3kg) → 碳水 <strong>-20g</strong></p>
+<p>体重变化后用<strong>新体重</strong>重新计算</p>
+</div>
+</div>
+</div>
+
+<div id="cycleResult" style="display:none;">
+<div class="card">
+<h2>高碳日（大肌群训练日）</h2>
+<table>
+<tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
+<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>午餐</td><td style="text-align:left" id="c-h-lunch">—</td><td id="c-h-lunch-c">0</td><td id="c-h-lunch-p">0</td><td id="c-h-lunch-f">0</td></tr>
+<tr><td>晚餐</td><td style="text-align:left" id="c-h-dinner">—</td><td id="c-h-dinner-c">0</td><td id="c-h-dinner-p">0</td><td id="c-h-dinner-f">0</td></tr>
+<tr style="font-weight:700"><td>日总计</td><td></td><td id="c-h-total-c">0</td><td id="c-h-total-p">0</td><td id="c-h-total-f">0</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>中碳日（胸/背/肩/手臂）</h2>
+<table>
+<tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
+<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>午餐</td><td style="text-align:left" id="c-m-lunch">—</td><td id="c-m-lunch-c">0</td><td id="c-m-lunch-p">0</td><td id="c-m-lunch-f">0</td></tr>
+<tr><td>晚餐</td><td style="text-align:left" id="c-m-dinner">—</td><td id="c-m-dinner-c">0</td><td id="c-m-dinner-p">0</td><td id="c-m-dinner-f">0</td></tr>
+<tr style="font-weight:700"><td>日总计</td><td></td><td id="c-m-total-c">0</td><td id="c-m-total-p">0</td><td id="c-m-total-f">0</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>低碳日（休息日）</h2>
+<table>
+<tr><th>餐</th><th>内容</th><th>碳水</th><th>蛋白</th><th>脂肪</th></tr>
+<tr><td>早餐</td><td style="text-align:left">50g燕麦 + 200ml低脂奶 + 3全蛋</td><td>41g</td><td>33g</td><td>22g</td></tr>
+<tr><td>午餐</td><td style="text-align:left" id="c-l-lunch">—</td><td id="c-l-lunch-c">0</td><td id="c-l-lunch-p">0</td><td id="c-l-lunch-f">0</td></tr>
+<tr><td>晚餐</td><td style="text-align:left" id="c-l-dinner">—</td><td id="c-l-dinner-c">0</td><td id="c-l-dinner-p">0</td><td id="c-l-dinner-f">0</td></tr>
+<tr style="font-weight:700"><td>日总计</td><td></td><td id="c-l-total-c">0</td><td id="c-l-total-p">0</td><td id="c-l-total-f">0</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>训练匹配（4天一循环）</h2>
+<table>
+<tr><th>天</th><th>训练</th><th>类型</th><th>主食策略</th></tr>
+<tr><td>D1</td><td>背/腿(大肌群)</td><td><span class="tag-high">高碳</span></td><td>米饭/面条，少油</td></tr>
+<tr><td>D2</td><td>胸</td><td><span class="tag-mid">中碳</span></td><td>正常米饭</td></tr>
+<tr><td>D3</td><td>肩/手臂</td><td><span class="tag-mid">中碳</span></td><td>正常米饭</td></tr>
+<tr><td>D4</td><td>休息</td><td><span class="tag-low">低碳</span></td><td>红薯/土豆，多油</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>米饭速查</h2>
+<table>
+<tr><th></th><th>生米</th><th>熟米</th><th>约几碗</th></tr>
+<tr><td><span class="tag-high">高碳日</span></td><td id="c-h-rice">0g</td><td id="c-h-rice-c">0g</td><td id="c-h-bowl">0</td></tr>
+<tr><td><span class="tag-mid">中碳日</span></td><td id="c-m-rice">0g</td><td id="c-m-rice-c">0g</td><td id="c-m-bowl">0</td></tr>
+<tr><td><span class="tag-low">低碳日</span></td><td id="c-l-rice" colspan="3">换红薯 <span id="c-l-potato">0</span>g</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>调整信号</h2>
+<div class="tips">
+<p><strong>晨脉高8-12下</strong> → 当天升为高碳</p>
+<p><strong>性欲减退/月经不调</strong> → 加饱和脂肪 + 停训2天</p>
+<p><strong>停滞2周</strong> → 每天碳水 -15g</p>
+<p><strong>掉太快 >1.5kg/周</strong> → 碳水 +20g</p>
+<p>高碳日吃<strong>好消化</strong>的：米饭、面条、馒头</p>
+<p>低碳日吃<strong>扛饿</strong>的：红薯、土豆、魔芋</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>3个月目标</h2>
+<div class="result-grid">
+<div class="result-box"><div class="label">起始体重</div><div class="value" id="goal-start">95</div><div class="sub">kg</div></div>
+<div class="result-box"><div class="label">目标体重</div><div class="value" id="goal-end">85</div><div class="sub">kg</div></div>
+<div class="result-box"><div class="label">合理速度</div><div class="value">0.5-1</div><div class="sub">kg/周</div></div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+let currentMode = 'fixed';
+let calcData = {};
+
+function calculate() {
+    const w = parseFloat(document.getElementById('weight').value);
+    const bodyType = document.getElementById('bodyType').value;
+    const exercise = document.getElementById('exercise').value;
+    const gender = document.getElementById('gender').value;
+
+    const carbTable = { male: { '2': 2.2, '3': 2.5, '4': 3.0, '5': 3.5 }, female: { '2': 2.0, '3': 2.2, '4': 2.5, '5': 3.0 } };
+    const proTable = { '2': 1.4, '3': 1.6, '4': 1.7, '5': 1.8 };
+    const fatTable = { male: { '2': 0.8, '3': 0.9, '4': 0.9, '5': 1.0 }, female: { '2': 1.0, '3': 1.1, '4': 1.1, '5': 1.2 } };
+
+    // Fixed mode (谭成毅)
+    const fCarb = Math.round(w * carbTable[gender][exercise]);
+    const fPro = Math.round(w * proTable[exercise]);
+    const fFat = Math.round(w * fatTable[gender][exercise]);
+    const fCal = Math.round(fCarb * 4 + fPro * 4 + fFat * 9);
+    const fRice = Math.round((fCarb - 41) / 0.77); // subtract breakfast carbs
+    const fRiceCooked = Math.round(fRice * 2.5);
+
+    document.getElementById('f-carb').textContent = fCarb;
+    document.getElementById('f-protein').textContent = fPro;
+    document.getElementById('f-fat').textContent = fFat;
+    document.getElementById('f-cal').textContent = fCal;
+    document.getElementById('f-rice').textContent = fRice;
+    document.getElementById('f-rice-cooked').textContent = fRiceCooked;
+
+    // Cycle mode (凯圣王)
+    const cCarbBase = bodyType === 'endo' ? 2 : 3;
+    const cFatBase = bodyType === 'endo' ? 0.8 : 1.1;
+    const cPro = Math.round(w * 1.2);
+
+    const weekCarb = Math.round(w * cCarbBase * 7);
+    const weekFat = Math.round(w * cFatBase * 7);
+
+    const hCarb = Math.round(weekCarb * 0.5 / 2);
+    const mCarb = Math.round(weekCarb * 0.35 / 3);
+    const lCarb = Math.round(weekCarb * 0.15 / 2);
+
+    const hFat = Math.round(weekFat * 0.15 / 2);
+    const mFat = Math.round(weekFat * 0.35 / 3);
+    const lFat = Math.round(weekFat * 0.5 / 2);
+
+    const hCal = Math.round(hCarb * 4 + cPro * 4 + hFat * 9);
+    const mCal = Math.round(mCarb * 4 + cPro * 4 + mFat * 9);
+    const lCal = Math.round(lCarb * 4 + cPro * 4 + lFat * 9);
+
+    const hRice = Math.round((hCarb - 41) / 0.77);
+    const mRice = Math.round((mCarb - 41) / 0.77);
+    const lPotato = Math.round((lCarb - 41) / 0.22);
+
+    const hCooked = Math.round(hRice * 2.5);
+    const mCooked = Math.round(mRice * 2.5);
+    const hRiceLunch = Math.round(hRice * 0.53);
+    const hRiceDinner = hRice - hRiceLunch;
+    const hCookedLunch = Math.round(hRiceLunch * 2.5);
+    const hCookedDinner = Math.round(hRiceDinner * 2.5);
+    const mRiceLunch = Math.round(mRice * 0.56);
+    const mRiceDinner = mRice - mRiceLunch;
+    const mCookedLunch = Math.round(mRiceLunch * 2.5);
+    const mCookedDinner = Math.round(mRiceDinner * 2.5);
+    const lLunchPotato = Math.round(lPotato * 0.57);
+    const lDinnerPotato = lPotato - lLunchPotato;
+
+    // 高碳日
+    const hLunchC = Math.round(hRiceLunch * 0.77);
+    const hDinnerC = Math.round(hRiceDinner * 0.77);
+    document.getElementById('c-h-lunch').textContent = `${hRiceLunch}g生米(${hCookedLunch}g熟米) + 250g鸡腿 + 少油蔬菜`;
+    document.getElementById('c-h-lunch-c').textContent = hLunchC + 'g';
+    document.getElementById('c-h-lunch-p').textContent = '60g';
+    document.getElementById('c-h-lunch-f').textContent = '27g';
+    document.getElementById('c-h-dinner').textContent = `${hRiceDinner}g生米(${hCookedDinner}g熟米) + 250g鸡腿 + 蔬菜`;
+    document.getElementById('c-h-dinner-c').textContent = hDinnerC + 'g';
+    document.getElementById('c-h-dinner-p').textContent = '60g';
+    document.getElementById('c-h-dinner-f').textContent = '20g';
+    document.getElementById('c-h-total-c').textContent = hCarb + 'g';
+    document.getElementById('c-h-total-p').textContent = cPro + 'g';
+    document.getElementById('c-h-total-f').textContent = hFat + 'g';
+
+    // 中碳日
+    const mLunchC = Math.round(mRiceLunch * 0.77);
+    const mDinnerC = Math.round(mRiceDinner * 0.77);
+    document.getElementById('c-m-lunch').textContent = `${mRiceLunch}g生米(${mCookedLunch}g熟米) + 250g鸡腿 + 11g油炒菜`;
+    document.getElementById('c-m-lunch-c').textContent = mLunchC + 'g';
+    document.getElementById('c-m-lunch-p').textContent = '60g';
+    document.getElementById('c-m-lunch-f').textContent = '31g';
+    document.getElementById('c-m-dinner').textContent = `${mRiceDinner}g生米(${mCookedDinner}g熟米) + 250g鸡腿 + 蔬菜`;
+    document.getElementById('c-m-dinner-c').textContent = mDinnerC + 'g';
+    document.getElementById('c-m-dinner-p').textContent = '60g';
+    document.getElementById('c-m-dinner-f').textContent = '20g';
+    document.getElementById('c-m-total-c').textContent = mCarb + 'g';
+    document.getElementById('c-m-total-p').textContent = cPro + 'g';
+    document.getElementById('c-m-total-f').textContent = mFat + 'g';
+
+    // 低碳日
+    const lLunchC = Math.round(lLunchPotato * 0.22);
+    const lDinnerC = Math.round(lDinnerPotato * 0.22);
+    document.getElementById('c-l-lunch').textContent = `${lLunchPotato}g红薯 + 250g鸡腿 + 25g橄榄油拌菜`;
+    document.getElementById('c-l-lunch-c').textContent = lLunchC + 'g';
+    document.getElementById('c-l-lunch-p').textContent = '60g';
+    document.getElementById('c-l-lunch-f').textContent = '45g';
+    document.getElementById('c-l-dinner').textContent = `${lDinnerPotato}g红薯 + 250g鸡腿 + 20g坚果`;
+    document.getElementById('c-l-dinner-c').textContent = lDinnerC + 'g';
+    document.getElementById('c-l-dinner-p').textContent = '60g';
+    document.getElementById('c-l-dinner-f').textContent = '20g';
+    document.getElementById('c-l-total-c').textContent = lCarb + 'g';
+    document.getElementById('c-l-total-p').textContent = cPro + 'g';
+    document.getElementById('c-l-total-f').textContent = lFat + 'g';
+
+    document.getElementById('c-h-rice').textContent = hRice + 'g';
+    document.getElementById('c-h-rice-c').textContent = Math.round(hRice * 2.5) + 'g';
+    document.getElementById('c-h-bowl').textContent = (hRice * 2.5 / 150).toFixed(1) + '碗';
+    document.getElementById('c-m-rice').textContent = mRice + 'g';
+    document.getElementById('c-m-rice-c').textContent = Math.round(mRice * 2.5) + 'g';
+    document.getElementById('c-m-bowl').textContent = (mRice * 2.5 / 150).toFixed(1) + '碗';
+    document.getElementById('c-l-potato').textContent = lPotato;
+
+    document.getElementById('goal-start').textContent = w;
+    document.getElementById('goal-end').textContent = Math.round(w - 8) + '-' + Math.round(w - 5);
+
+    document.getElementById('results').style.display = 'block';
+    switchMode(currentMode);
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.toggle-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', (i === 0 && mode === 'fixed') || (i === 1 && mode === 'cycle'));
+    });
+    document.getElementById('fixedResult').style.display = mode === 'fixed' ? 'block' : 'none';
+    document.getElementById('cycleResult').style.display = mode === 'cycle' ? 'block' : 'none';
+    document.getElementById('modeLabel').textContent = mode === 'fixed'
+        ? '每天吃一样，简单易执行（谭成毅方法）'
+        : '高中低碳轮换，配合训练日（凯圣王方法）';
+}
+
+calculate();
+</script>
+</body>
+</html>
