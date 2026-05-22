@@ -357,11 +357,13 @@ function calculate() {
     document.getElementById('c-l-bf-f').textContent = lOatsFat + 'g';
     const lLunchC = Math.round(lLunchPotato * 0.22);
     const lDinnerC = Math.round(lDinnerPotato * 0.22) + 6;
-    document.getElementById('c-l-lunch').textContent = `${lLunchPotato}g红薯 + 250g鸡腿 + 25g橄榄油拌菜`;
+    const lRiceLunch = Math.round(lLunchPotato * 0.22 / 0.77);
+    const lRiceDinner = Math.round(lDinnerPotato * 0.22 / 0.77);
+    document.getElementById('c-l-lunch').textContent = `${lRiceLunch}g生米(${Math.round(lRiceLunch*2.5)}g熟米)/${lLunchPotato}g红薯 + 250g鸡腿 + 25g橄榄油拌菜`;
     document.getElementById('c-l-lunch-c').textContent = lLunchC + 'g';
     document.getElementById('c-l-lunch-p').textContent = '60g';
     document.getElementById('c-l-lunch-f').textContent = '45g';
-    document.getElementById('c-l-dinner').textContent = `${lDinnerPotato}g红薯 + 250g鸡腿 + 20g腰果`;
+    document.getElementById('c-l-dinner').textContent = `${lRiceDinner}g生米(${Math.round(lRiceDinner*2.5)}g熟米)/${lDinnerPotato}g红薯 + 250g鸡腿 + 20g腰果`;
     document.getElementById('c-l-dinner-c').textContent = lDinnerC + 'g';
     document.getElementById('c-l-dinner-p').textContent = '64g';
     document.getElementById('c-l-dinner-f').textContent = '29g';
