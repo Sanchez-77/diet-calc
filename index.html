@@ -182,7 +182,7 @@ tr:last-child td { border-bottom: none; }
 <tr><td>D1</td><td>背/腿(大肌群)</td><td><span class="tag-high">高碳</span></td><td>米饭/面条，少油</td></tr>
 <tr><td>D2</td><td>胸</td><td><span class="tag-mid">中碳</span></td><td>正常米饭</td></tr>
 <tr><td>D3</td><td>肩/手臂</td><td><span class="tag-mid">中碳</span></td><td>正常米饭</td></tr>
-<tr><td>D4</td><td>休息</td><td><span class="tag-low">低碳</span></td><td>红薯/土豆，多油</td></tr>
+<tr><td>D4</td><td>休息</td><td><span class="tag-low">低碳</span></td><td>米饭/红薯/土豆，多油</td></tr>
 </table>
 </div>
 
@@ -192,7 +192,7 @@ tr:last-child td { border-bottom: none; }
 <tr><th></th><th>生米</th><th>熟米</th><th>约几碗</th></tr>
 <tr><td><span class="tag-high">高碳日</span></td><td id="c-h-rice">0g</td><td id="c-h-rice-c">0g</td><td id="c-h-bowl">0</td></tr>
 <tr><td><span class="tag-mid">中碳日</span></td><td id="c-m-rice">0g</td><td id="c-m-rice-c">0g</td><td id="c-m-bowl">0</td></tr>
-<tr><td><span class="tag-low">低碳日</span></td><td id="c-l-rice" colspan="3">换红薯 <span id="c-l-potato">0</span>g</td></tr>
+<tr><td><span class="tag-low">低碳日</span></td><td id="c-l-rice">0g</td><td id="c-l-rice-c">0g</td><td id="c-l-bowl">0</td></tr>
 </table>
 </div>
 
@@ -375,7 +375,10 @@ function calculate() {
     document.getElementById('c-m-rice').textContent = mRice + 'g';
     document.getElementById('c-m-rice-c').textContent = Math.round(mRice * 2.5) + 'g';
     document.getElementById('c-m-bowl').textContent = (mRice * 2.5 / 150).toFixed(1) + '碗';
-    document.getElementById('c-l-potato').textContent = lPotato;
+    const lRice = Math.round((lCarb - lOatsCarb - 6) / 0.77);
+    document.getElementById('c-l-rice').textContent = lRice + 'g';
+    document.getElementById('c-l-rice-c').textContent = Math.round(lRice * 2.5) + 'g';
+    document.getElementById('c-l-bowl').textContent = (lRice * 2.5 / 150).toFixed(1) + '碗';
 
     document.getElementById('goal-start').textContent = w;
     document.getElementById('goal-end').textContent = Math.round(w - 8) + '-' + Math.round(w - 5);
